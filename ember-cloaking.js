@@ -12,6 +12,7 @@
     bottomVisible: null,
     offsetFixedTopElement: null,
     offsetFixedBottomElement: null,
+    usesOverflow: false,
 
     init: function() {
       var cloakView = this.get('cloakView'),
@@ -84,6 +85,8 @@
       if (max < min) { return min; }
 
       var wrapperTop = this.get('wrapperTop')>>0;
+      if (this.get('usesOverflow'))
+        wrapperTop = 0;
 
       while(max>min){
         var mid = Math.floor((min + max) / 2),
@@ -145,10 +148,12 @@
       // Find the bottom view and what's onscreen
       while (bottomView < childViews.length) {
         var view = childViews[bottomView],
-          $view = view.$(),
+          $view = view.$();
           // in case of not full-window scrolling
-          scrollOffset = this.get('wrapperTop') || 0,
-          viewTop = $view.offset().top + scrollOffset,
+        var scrollOffset = this.get('wrapperTop') || 0;
+        if (this.get('usesOverflow'))
+          scrollOffset = 0;
+        var viewTop = $view.offset().top + scrollOffset,
           viewBottom = viewTop + $view.height();
 
         if (viewTop > viewportBottom) { break; }
